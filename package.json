@@ -4,14 +4,16 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "start": "nodemon src/index.js",
+    "start": "nodemon index.js",
     "test": "jest --watch"
   },
   "keywords": [],
   "author": "Saulo Assis silva",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.19.2"
+    "express": "^4.19.2",
+    "sequelize": "^6.37.3",
+    "sqlite3": "^5.1.7"
   },
   "devDependencies": {
     "@eslint/js": "^9.3.0",

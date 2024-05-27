@@ -1,9 +1,13 @@
 const express = require('express');
+const User = require('./user/User');
 
 const app = express();
+app.use(express.json());
 
 app.post('/api/v1/users', (req, res) => {
-  res.status(200).send({ message: 'success message' });
+  User.create(req.body).then(() => {
+    res.send({ message: 'success message' });
+  });
 });
 
 module.exports = app;
