@@ -69,4 +69,18 @@ describe('Register: User', () => {
         });
       });
   });
+
+  test('it should hash password', (done) => {
+    request(app)
+      .post('/api/v1/users')
+      .send(defaultUser)
+      .then(() => {
+        User.findAll().then((userList) => {
+          const savedUser = userList[0];
+          //expect(savedUser.password).toBe(defaultUser.password); // confere se sao iguais de fato ou se a diferença n foi um erro
+          expect(savedUser.password).not.toBe(defaultUser.password);
+          done();
+        });
+      });
+  });
 });
