@@ -4,7 +4,6 @@ const router = express.Router();
 
 router.post('/api/v1/users', async (req, res) => {
   await UserService.save(req.body);
-
   return res.send({ message: 'success message' });
 });
 
