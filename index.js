@@ -3,6 +3,8 @@ const sequelize = require('./src/config/database');
 const port = 3333;
 
 sequelize.sync();
+
+console.log('env ' + process.env.NODE_ENV);
 app.listen(port, () => {
   console.log(`the app is runnin on port http://localhost:${port}`);
 });

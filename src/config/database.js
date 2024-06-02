@@ -1,9 +1,17 @@
 const Sequelize = require('sequelize');
+const config = require('config');
 
-const sequelize = new Sequelize('postit', 'my-user-db', 'fake-password', {
-  dialect: 'sqlite',
-  storage: './databse.sqlite',
-  logging: false,
-});
+const dBconfig = config.get('database');
+
+const sequelize = new Sequelize(
+  dBconfig.database,
+  dBconfig.username,
+  dBconfig.password,
+  {
+    dialect: dBconfig.dialect,
+    storage: dBconfig.storage,
+    logging: false,
+  },
+);
 
 module.exports = sequelize;
