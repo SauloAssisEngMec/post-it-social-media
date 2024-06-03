@@ -94,4 +94,25 @@ describe('Register: User', () => {
 
     expect(body.validationErrors.userName).toBe('userName cant be null');
   });
+
+  test('it should return E-mail cant be null when E-Mail was null', async () => {
+    const nullEmail = Object.assign({}, defaultUser, { email: null });
+
+    const response = await request(app).post('/api/v1/users').send(nullEmail);
+    const body = response.body;
+
+    expect(body.validationErrors.email).toBe('E-mail cant be null');
+  });
+
+  test('it should return errors for both E-mail and userName when both are null', async () => {
+    const bothNull = Object.assign({}, defaultUser, {
+      userName: null,
+      email: null,
+    });
+
+    const response = await request(app).post('/api/v1/users').send(bothNull);
+    const body = response.body;
+
+    expect(Object.keys(body.validationErrors)).toEqual(['userName', 'email']);
+  });
 });

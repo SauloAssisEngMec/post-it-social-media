@@ -1,17 +1,47 @@
 const express = require('express');
 const UserService = require('./UserService');
-const { ValidationError } = require('sequelize');
+
 const router = express.Router();
 
-router.post('/api/v1/users', async (req, res) => {
+const validateUserName = (req, res, next) => {
   const user = req.body;
   if (user.userName === null) {
-    return res
-      .status(400)
-      .send({ validationErrors: { userName: 'userName cant be null' } });
+    req.validationErrors = {
+      userName: 'userName cant be null',
+    };
+    // return res
+    //   .status(400)
+    //   .send({ validationErrors: { userName: 'userName cant be null' } });
   }
-  await UserService.save(req.body);
-  return res.send({ message: 'success message' });
-});
+  next();
+};
+
+const validateEmail = (req, res, next) => {
+  const user = req.body;
+  if (user.email === null) {
+    req.validationErrors = {
+      ...req.validationErrors,
+      email: 'E-mail cant be null',
+    };
+    // return res
+    //   .status(400)
+    //   .send({ validationErrors: { email: 'E-mail cant be null' } });
+  }
+  next();
+};
+
+router.post(
+  '/api/v1/users',
+  validateUserName,
+  validateEmail,
+  async (req, res) => {
+    if (req.validationErrors) {
+      const response = { validationErrors: { ...req.validationErrors } };
+      return res.status(400).send(response);
+    }
+    await UserService.save(req.body);
+    return res.send({ message: 'success message' });
+  },
+);
 
 module.exports = router;
