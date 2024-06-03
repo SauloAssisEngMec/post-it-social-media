@@ -68,4 +68,30 @@ describe('Register: User', () => {
 
     expect(savedUser.password).not.toBe(defaultUser.password);
   });
+
+  test('it should return status code 400', async () => {
+    const nullUser = Object.assign({}, defaultUser, { userName: null });
+
+    const response = await request(app).post('/api/v1/users').send(nullUser);
+
+    expect(response.status).toBe(400);
+  });
+
+  test('it should return validationErrors when validation errors occurs', async () => {
+    const nullUser = Object.assign({}, defaultUser, { userName: null });
+
+    const response = await request(app).post('/api/v1/users').send(nullUser);
+    const body = response.body;
+
+    expect(body.validationErrors).not.toBeUndefined();
+  });
+
+  test('it should return userName cant be null when userName was null', async () => {
+    const nullUser = Object.assign({}, defaultUser, { userName: null });
+
+    const response = await request(app).post('/api/v1/users').send(nullUser);
+    const body = response.body;
+
+    expect(body.validationErrors.userName).toBe('userName cant be null');
+  });
 });
