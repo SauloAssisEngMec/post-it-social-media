@@ -4,9 +4,9 @@ const User = require('../src/user/User');
 const sequelize = require('../src/config/database');
 
 const defaultUser = {
-  userName: 'saulo',
-  email: 'saulo@hotmail.com',
-  password: 'fssdujdwdho',
+  userName: 'saulo1',
+  email: 'saulo1@mail.com',
+  password: 'P4ssword',
 };
 
 beforeAll(() => {
@@ -145,14 +145,29 @@ describe('Register: User', () => {
   // implementing dinamic test with (test.each`table`(name, fn, timeout))
 
   test.each`
-    field         | expected
-    ${'userName'} | ${'userName cant be null'}
-    ${'email'}    | ${'E-mail cant be null'}
-    ${'password'} | ${'Password cant be null'}
-  `('returns $expected when $field is null', async ({ field, expected }) => {
-    const nullField = (defaultUser[field] = null);
-    const response = await request(app).post('/api/v1/users').send(nullField);
-    const body = response.body;
-    expect(body.validationErrors[field]).toBe(expected);
-  });
+    field         | value                  | expected
+    ${'userName'} | ${null}                | ${'userName cant be null'}
+    ${'userName'} | ${'t'.repeat(29)}      | ${'This must be between 4 to 27 characters'}
+    ${'email'}    | ${null}                | ${'E-mail cant be null'}
+    ${'email'}    | ${'mail.com'}          | ${'E-mail is not valid'}
+    ${'email'}    | ${'anything.mail.com'} | ${'E-mail is not valid'}
+    ${'email'}    | ${'anything@mail'}     | ${'E-mail is not valid'}
+    ${'password'} | ${null}                | ${'Password cant be null'}
+    ${'password'} | ${'P4ss'}              | ${'password must has at least 6 characters'}
+    ${'password'} | ${'ALLUPPERCASE'}      | ${'password must have at leats 1 UPPERCASE, 1 lowercase and one character'}
+  `(
+    'returns $expected when $field is $value',
+    async ({ field, expected, value }) => {
+      const user = {
+        userName: 'saulo1',
+        email: 'saulo1@mail.com',
+        password: 'P4ssword',
+      };
+      user[field] = value;
+      console.log(user);
+      const response = await request(app).post('/api/v1/users').send(user);
+      const body = response.body;
+      expect(body.validationErrors[field]).toBe(expected);
+    },
+  );
 });
