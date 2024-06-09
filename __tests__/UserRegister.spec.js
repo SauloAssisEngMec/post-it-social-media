@@ -155,6 +155,7 @@ describe('Register: User', () => {
     ${'password'} | ${null}                | ${'Password cant be null'}
     ${'password'} | ${'P4ss'}              | ${'password must has at least 6 characters'}
     ${'password'} | ${'ALLUPPERCASE'}      | ${'password must have at leats 1 UPPERCASE, 1 lowercase and one character'}
+    ${'password'} | ${'alllowercaser'}     | ${'password must have at leats 1 UPPERCASE, 1 lowercase and one character'}
   `(
     'returns $expected when $field is $value',
     async ({ field, expected, value }) => {
@@ -164,10 +165,28 @@ describe('Register: User', () => {
         password: 'P4ssword',
       };
       user[field] = value;
-      console.log(user);
+
       const response = await request(app).post('/api/v1/users').send(user);
       const body = response.body;
       expect(body.validationErrors[field]).toBe(expected);
     },
   );
+
+  test('it should return E-mail is already in use  when the same E-mail already exist', async () => {
+    await User.create({ ...defaultUser });
+    const response = await request(app).post('/api/v1/users').send(defaultUser);
+    const body = response.body;
+    expect(body.validationErrors.email).toBe('E-mail is already in use');
+  });
+
+  test('it should return errors for both userName is null and E-mail already exist', async () => {
+    await User.create({ ...defaultUser });
+    const response = await request(app).post('/api/v1/users').send({
+      userName: null,
+      email: 'saulo1@mail.com',
+      password: 'P4ssword',
+    });
+    const body = response.body;
+    expect(Object.keys(body.validationErrors)).toEqual(['userName', 'email']);
+  });
 });

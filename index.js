@@ -2,7 +2,7 @@ const app = require('./src/app');
 const sequelize = require('./src/config/database');
 const port = 3333;
 
-sequelize.sync();
+sequelize.sync({ force: true });
 
 console.log('env ' + process.env.NODE_ENV);
 app.listen(port, () => {
