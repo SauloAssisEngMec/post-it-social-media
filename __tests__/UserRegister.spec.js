@@ -98,52 +98,6 @@ describe('Register: User', () => {
     expect(Object.keys(body.validationErrors)).toEqual(['userName', 'email']);
   });
 
-  // test('it should return userName cant be null when userName was null', async () => {
-  //   const nullUser = Object.assign({}, defaultUser, { userName: null });
-
-  //   const response = await request(app).post('/api/v1/users').send(nullUser);
-  //   const body = response.body;
-
-  //   expect(body.validationErrors.userName).toBe('userName cant be null');
-  // });
-
-  // test('it should return E-mail cant be null when E-Mail was null', async () => {
-  //   const nullEmail = Object.assign({}, defaultUser, { email: null });
-
-  //   const response = await request(app).post('/api/v1/users').send(nullEmail);
-  //   const body = response.body;
-
-  //   expect(body.validationErrors.email).toBe('E-mail cant be null');
-  // });
-
-  // test('it should return Password cant be null when password is null', async () => {
-  //   const nullPassword = Object.assign({}, defaultUser, { password: null });
-
-  //   const response = await request(app)
-  //     .post('/api/v1/users')
-  //     .send(nullPassword);
-  //   const body = response.body;
-
-  //   expect(body.validationErrors.password).toBe('Password cant be null');
-  // });
-
-  // implementing dinamic test for similar test  with (test.each(table)(name, fn, timeout))
-
-  // test.each([
-  //   ['userName', 'userName cant be null'],
-  //   ['email', 'E-mail cant be null'],
-  //   ['password', 'Password cant be null'],
-  // ])('When %s is null then %s is a response', async (field, expected) => {
-  //   const nullField = (defaultUser[field] = null);
-
-  //   const response = await request(app).post('/api/v1/users').send(nullField);
-  //   const body = response.body;
-
-  //   expect(body.validationErrors[field]).toBe(expected);
-  // });
-
-  // implementing dinamic test with (test.each`table`(name, fn, timeout))
-
   test.each`
     field         | value                  | expected
     ${'userName'} | ${null}                | ${'userName cant be null'}
@@ -188,5 +142,28 @@ describe('Register: User', () => {
     });
     const body = response.body;
     expect(Object.keys(body.validationErrors)).toEqual(['userName', 'email']);
+  });
+
+  test('it should creates a user in a inactive mode by default', async () => {
+    await request(app).post('/api/v1/users').send(defaultUser);
+    const users = await User.findAll(); //  there is only one in db
+    const user = users[0];
+    expect(user.inactive).toBe(true);
+  });
+
+  test('it should creates a user in a inactive mode by default even the request force inactive = false', async () => {
+    await request(app)
+      .post('/api/v1/users')
+      .send({ ...defaultUser, inactive: false });
+    const users = await User.findAll(); //  there is only one in db
+    const user = users[0];
+    expect(user.inactive).toBe(true);
+  });
+
+  test('it should creates a activationToken for uses', async () => {
+    await request(app).post('/api/v1/users').send(defaultUser);
+    const users = await User.findAll();
+    const user = users[0];
+    expect(user.activationToken).toBeTruthy();
   });
 });
