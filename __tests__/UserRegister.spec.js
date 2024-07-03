@@ -2,6 +2,7 @@ const request = require('supertest');
 const app = require('../src/app');
 const User = require('../src/user/User');
 const sequelize = require('../src/config/database');
+const nodemailerStub = require('nodemailer-stub');
 
 const defaultUser = {
   userName: 'saulo1',
@@ -98,6 +99,8 @@ describe('Register: User', () => {
     expect(Object.keys(body.validationErrors)).toEqual(['userName', 'email']);
   });
 
+  // similar test
+
   test.each`
     field         | value                  | expected
     ${'userName'} | ${null}                | ${'userName cant be null'}
@@ -165,5 +168,14 @@ describe('Register: User', () => {
     const users = await User.findAll();
     const user = users[0];
     expect(user.activationToken).toBeTruthy();
+  });
+
+  test('it should sends a Account Activation with activationToken', async () => {
+    await request(app).post('/api/v1/users').send(defaultUser);
+    const lastMail = nodemailerStub.interactsWithMail.lastMail();
+    expect(lastMail.to[0]).toBe('saulo1@mail.com');
+    const users = await User.findAll();
+    const savedUser = users[0];
+    expect(lastMail.content).toContain(savedUser.activationToken);
   });
 });
